@@ -1,0 +1,29 @@
+{
+  "name": "dsh-notify",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "author": "starsYHyh",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/starsYHyh/dsh-plugins.git",
+    "directory": "plugins/dsh-notify"
+  },
+  "description": "Native desktop notifications for DSH sessions: turn completion and pending confirmations",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "default": "./lib/client.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "client": {
+      "platform": "web"
+    }
+  }
+}
