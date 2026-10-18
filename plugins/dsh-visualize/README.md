@@ -9,6 +9,7 @@ client renders it in a sandboxed iframe with the current DSH theme.
 设计思路参考了 OpenAI Codex 内置的 `visualize` skill：由 skill 描述工作流与输出契约，客户端把 HTML 片段渲染成对话内联画布。
 
 本插件的 skill 文案、Host/Client 实现、样式与测试均为重新编写，不包含 Codex 的源码或资源；代码以 MIT 授权。
+
 ## Layout
 
     lib/index.js      host half: /dsh-visualize/view route, theme injection, CSP

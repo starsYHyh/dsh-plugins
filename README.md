@@ -20,6 +20,7 @@
 
 > **dsh-visualize 的参考来源**：设计思路参考 OpenAI Codex 内置的 `visualize` skill（skill + 内联 HTML 画布契约）；
 > 本仓库的实现、skill 文案与样式均为重新编写，未包含 Codex 的源码或资源。
+
 ## 安装 dsh-notify
 
 前提：已安装 DeepSeek Harness 桌面端。本插件通过页面自己的 `Notification` API 弹通知
