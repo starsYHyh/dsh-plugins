@@ -1,0 +1,66 @@
+<div class="card" style="max-width: 640px;">
+  <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:10px;">
+    <h3 style="margin:0;">构建耗时对比</h3>
+    <button class="btn" type="button" id="viz-demo-toggle" aria-pressed="false">切换数据</button>
+  </div>
+  <svg id="viz-demo-chart" viewBox="0 0 520 190" role="img" aria-label="两种构建方式的耗时柱状图">
+    <g id="viz-demo-bars" fill="var(--primary)"></g>
+    <g id="viz-demo-labels" fill="var(--muted-foreground)" font-size="12"></g>
+  </svg>
+  <p class="text-small text-muted" id="viz-demo-note" style="margin:10px 0 0;">单位：秒 · 数据为近 7 天中位数</p>
+</div>
+<script>
+(function () {
+  var datasets = {
+    a: { values: [42, 7, 18, 3], labels: ['全量', '增量', '依赖变更', '仅源码'], note: '单位：秒 · 数据为近 7 天中位数' },
+    b: { values: [3, 9, 17, 36], labels: ['单文件', '单模块', '跨模块', '全量'], note: '单位：秒 · 与改动文件数正相关' }
+  };
+  var current = 'a';
+  var bars = document.getElementById('viz-demo-bars');
+  var labels = document.getElementById('viz-demo-labels');
+  var note = document.getElementById('viz-demo-note');
+  var toggle = document.getElementById('viz-demo-toggle');
+
+  function render() {
+    var data = datasets[current];
+    var max = Math.max.apply(null, data.values);
+    var scale = 120 / max;
+    bars.textContent = '';
+    labels.textContent = '';
+    for (var i = 0; i < data.values.length; i++) {
+      var x = 30 + i * 120;
+      var height = Math.max(6, Math.round(data.values[i] * scale));
+      var y = 150 - height;
+      var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      rect.setAttribute('x', String(x));
+      rect.setAttribute('y', String(y));
+      rect.setAttribute('width', '56');
+      rect.setAttribute('height', String(height));
+      rect.setAttribute('rx', '6');
+      bars.appendChild(rect);
+      var label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      label.setAttribute('x', String(x + 28));
+      label.setAttribute('y', '168');
+      label.setAttribute('text-anchor', 'middle');
+      label.textContent = data.labels[i];
+      labels.appendChild(label);
+      var value = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      value.setAttribute('x', String(x + 28));
+      value.setAttribute('y', String(y - 8));
+      value.setAttribute('text-anchor', 'middle');
+      value.setAttribute('fill', 'var(--foreground)');
+      value.setAttribute('font-size', '12');
+      value.textContent = data.values[i] + 's';
+      labels.appendChild(value);
+    }
+    note.textContent = data.note;
+    toggle.setAttribute('aria-pressed', current === 'b' ? 'true' : 'false');
+  }
+
+  toggle.addEventListener('click', function () {
+    current = current === 'a' ? 'b' : 'a';
+    render();
+  });
+  render();
+})();
+</script>

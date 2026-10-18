@@ -1,0 +1,32 @@
+{
+  "name": "dsh-visualize",
+  "version": "0.2.2",
+  "private": true,
+  "description": "Inline HTML visualizations inside the DSH conversation: a sandboxed iframe per visualize{path} content reference.",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "default": "./lib/client.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "client": {
+      "platform": "web"
+    }
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT",
+  "author": "starsYHyh",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/starsYHyh/dsh-plugins.git",
+    "directory": "plugins/dsh-visualize"
+  }
+}

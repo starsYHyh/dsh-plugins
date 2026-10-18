@@ -1,0 +1,6 @@
+# Append this row to ~/.dsh/profiles/desktop/cordis.patch.yml.
+# The launcher anchors a relative row name to the patch file's directory, so the
+# plugin needs no node_modules entry.
+- insert:
+    - id: dsh-visualize
+      name: ./plugins/dsh-visualize/lib/index.js

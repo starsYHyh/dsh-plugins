@@ -1,0 +1,64 @@
+/*
+ * dsh-visualize wrapper styles.
+ *
+ * Served with every viewer document; theme values arrive separately as CSS
+ * custom properties in :root. Edit this file and the next rendered viewer picks
+ * it up without restarting the host (read per request, cached by mtime).
+ */
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: transparent; }
+body {
+  padding: 12px 14px;
+  color: var(--foreground);
+  font: 14px/1.55 var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-wrap: anywhere;
+}
+
+/* Center the content column by default; full-width blocks are unaffected. */
+body > * { margin-left: auto; margin-right: auto; }
+
+h1, h2, h3 { margin: 0 0 10px; font-weight: 600; line-height: 1.3; }
+h1 { font-size: 18px; }
+h2 { font-size: 16px; }
+h3 { font-size: 14px; }
+p { margin: 0 0 10px; }
+p:last-child { margin-bottom: 0; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--card); color: var(--foreground);
+  font: inherit; font-size: 13px; cursor: pointer;
+}
+.btn:hover { background: var(--muted); }
+.btn-primary { background: var(--primary); border-color: transparent; color: var(--primary-foreground); }
+.btn-primary:hover { background: var(--primary); filter: brightness(1.06); }
+
+.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table th, .table td { padding: 6px 10px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+.table th { color: var(--muted-foreground); font-weight: 500; }
+
+.text-muted { color: var(--muted-foreground); }
+.text-small { font-size: 12px; }
+.text-error { color: #e5484d; }
+.text-center { text-align: center; }
+
+.viz-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.viz-stat { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 12px; }
+.viz-stat-value { font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+hr { border: 0; border-top: 1px solid var(--border); margin: 14px 0; }
+
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+code { background: var(--code-bg); border-radius: 4px; padding: 1px 5px; font-size: 12px; }
+pre { background: var(--code-bg); border-radius: 8px; padding: 12px; overflow: auto; font-size: 12px; }
+
+svg { max-width: 100%; }
