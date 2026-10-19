@@ -24,7 +24,7 @@ client renders it in a sandboxed iframe with the current DSH theme.
 
 This plugin lives in the dsh-plugins repository:
 
-    ~/.dsh/dsh-plugins/plugins/dsh-visualize          <- checkout
+    ~/Documents/deepseek-harness/dsh-dev/dsh-plugins/plugins/dsh-visualize          <- checkout
     ~/.dsh/profiles/desktop/plugins/dsh-visualize     -> symlink or copy
 
 ## Install
