@@ -2,7 +2,7 @@
   "name": "dsh-visualize",
   "version": "0.2.2",
   "private": true,
-  "description": "Inline HTML visualizations inside the DSH conversation: a sandboxed iframe per visualize{path} content reference.",
+  "description": "Inline HTML visualizations inside the DSH conversation: renders a sandboxed iframe from an HTML fragment referenced in an assistant reply.",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
