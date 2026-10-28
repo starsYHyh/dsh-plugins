@@ -23,6 +23,7 @@ function createEnvironment(options = {}) {
 			this.body = config?.body;
 			this.tag = config?.tag;
 			this.silent = config?.silent;
+			this.options = config ?? {};
 			this.closed = false;
 			shown.push(this);
 		}
@@ -138,6 +139,7 @@ const fast = (env) => env.sandbox.localStorage.setItem("dshNotify.settleMs", "20
 	env.status.publish(new Map([["s1", { running: true, pendingInteraction: undefined }]]));
 	assert.equal(env.shown.length, 1, "the greeting is the only banner so far");
 	assert.equal(env.shown[0].tag, "dsh-notify:greet");
+	assert.equal(env.shown[0].options.requireInteraction, undefined, "the greeting never requires interaction");
 	env.status.publish(new Map([["s1", { running: false, pendingInteraction: undefined }]]));
 	assert.equal(env.shown.length, 1, "a finished turn waits for the settle window");
 	await sleep(60);
@@ -146,6 +148,8 @@ const fast = (env) => env.sandbox.localStorage.setItem("dshNotify.settleMs", "20
 	assert.equal(env.shown[1].body, "回合已完成，可以回来查看了");
 	assert.equal(env.shown[1].tag, "dsh-notify:s1");
 	assert.equal(env.shown[1].silent, false);
+	assert.notEqual(env.shown[1].options.requireInteraction, true, "a finished turn is not a blocking notification");
+	assert.equal(env.shown[1].options.requireInteraction, undefined, "done omits requireInteraction entirely");
 	env.dispose();
 }
 
@@ -174,8 +178,10 @@ const fast = (env) => env.sandbox.localStorage.setItem("dshNotify.settleMs", "20
 	env.status.publish(new Map([["s1", { running: false, pendingInteraction: approval }]]));
 	assert.equal(env.shown.length, before + 1);
 	assert.equal(env.shown.at(-1).body, "需要你批准工具调用：bash");
+	assert.equal(env.shown.at(-1).options.requireInteraction, true, "a pending approval stays on screen by default");
 	env.status.publish(new Map([["s1", { running: false, pendingInteraction: { sessionId: "s1" } }]]));
 	assert.equal(env.shown.at(-1).body, "需要你的输入");
+	assert.equal(env.shown.at(-1).options.requireInteraction, true, "a pending question stays on screen by default");
 	env.dispose();
 }
 
@@ -226,6 +232,7 @@ const fast = (env) => env.sandbox.localStorage.setItem("dshNotify.settleMs", "20
 	env.sandbox.__dshNotify.test();
 	assert.equal(env.shown.length, before + 1);
 	assert.equal(env.shown.at(-1).body, "这是一条测试通知");
+	assert.equal(env.shown.at(-1).options.requireInteraction, undefined, "the console test never requires interaction");
 	env.dispose();
 	assert.equal(env.sandbox.__dshNotify, undefined);
 }
@@ -279,6 +286,22 @@ const fast = (env) => env.sandbox.localStorage.setItem("dshNotify.settleMs", "20
 	assert.equal(state.notifications, 1);
 	assert.equal(state.lastReason, "done");
 	assert.ok(state.lastNotifiedAt > 0);
+	assert.equal(state.settings.longLived, true, "the default keeps blocking notifications long-lived");
+	env.dispose();
+}
+
+// 11. `dshNotify.longLived=0` stops the blocking notifications from requiring interaction.
+{
+	const env = createEnvironment({ focused: false });
+	fast(env);
+	env.sandbox.localStorage.setItem("dshNotify.longLived", "0");
+	assert.equal(env.sandbox.__dshNotify.state().settings.longLived, false);
+	env.rows.byId.s1 = { id: "s1", displayTitle: "Work", running: false };
+	env.status.publish(new Map([["s1", { running: false }]]));
+	env.status.publish(new Map([["s1", { running: false, pendingInteraction: { sessionId: "s1", toolName: "bash" } }]]));
+	assert.equal(env.shown.at(-1).body, "需要你批准工具调用：bash");
+	assert.notEqual(env.shown.at(-1).options.requireInteraction, true, "longLived=0 disables requireInteraction");
+	assert.equal(env.shown.at(-1).options.requireInteraction, undefined);
 	env.dispose();
 }
 

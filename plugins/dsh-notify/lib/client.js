@@ -56,6 +56,7 @@ window.__ModuleLoader__.load({
 				silent: readFlag("silent", false),
 				always: readFlag("always", false),
 				subagents: readFlag("subagents", false),
+				longLived: readFlag("longLived", true),
 				settleMs: readNumber("settleMs", 1500, 0, 10000)
 			};
 		}
@@ -96,7 +97,8 @@ window.__ModuleLoader__.load({
 		 * Raise one native notification through the page's own Notification API.
 		 * @param title - notification title, normally the session display title.
 		 * @param body - notification body.
-		 * @param options - `tag` replaces a previous banner, `silent` suppresses the system sound.
+		 * @param options - `tag` replaces a previous banner, `silent` suppresses the system sound,
+		 * `requireInteraction` keeps a blocking notification on screen where the platform supports it.
 		 * @returns the notification, or undefined when the platform cannot deliver one.
 		 */
 		function deliver(title, body, options) {
@@ -117,11 +119,13 @@ window.__ModuleLoader__.load({
 			}
 			let notification;
 			try {
-				notification = new NotificationApi(title, {
+				const config = {
 					body,
 					tag: options?.tag ?? "dsh-notify",
 					silent: options?.silent === true
-				});
+				};
+				if (options?.requireInteraction === true) config.requireInteraction = true;
+				notification = new NotificationApi(title, config);
 			} catch (error) {
 				console.warn("[dsh-notify] the platform refused the notification:", error);
 				return undefined;
@@ -149,7 +153,7 @@ window.__ModuleLoader__.load({
 		* intermediate idle gap of a multi-round goal into a single notification.
 		*
 		* Settings live in localStorage under the `dshNotify.` prefix:
-		* `enabled`, `greet`, `silent`, `always`, `subagents`, `settleMs`.
+		* `enabled`, `greet`, `silent`, `always`, `subagents`, `longLived`, `settleMs`.
 		* `__dshNotify.test()` raises one notification on demand from the console.
 		*
 		* @param ctx - browser application context.
@@ -235,7 +239,8 @@ window.__ModuleLoader__.load({
 				const body = kind === "approval" ? strings.approval(detail) : kind === "input" ? strings.input : strings.done;
 				const delivered = deliver(title, body, {
 					tag: `dsh-notify:${sessionId}`,
-					silent: settings.silent
+					silent: settings.silent,
+					requireInteraction: settings.longLived && (kind === "approval" || kind === "input")
 				});
 				if (delivered !== undefined) {
 					diagnostics.notifications += 1;

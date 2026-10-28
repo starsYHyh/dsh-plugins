@@ -9,7 +9,7 @@
 
 | 插件 | 说明 | 位置 |
 |---|---|---|
-| **dsh-notify** | 会话事件的本机通知：回合完成、或需要你授权/回答时弹系统横幅；只在你**不看页面**时打扰 | [`plugins/dsh-notify/`](plugins/dsh-notify/) |
+| **dsh-notify** | 会话事件的本机通知：回合完成、或需要你授权/回答时弹系统横幅；只在你**不看页面**时打扰。macOS 上审批改由**带「允许一次 / 拒绝」按钮的原生小窗**接管，不切回应用就能决定 | [`plugins/dsh-notify/`](plugins/dsh-notify/) |
 | **dsh-visualize** | 对话内联可视化：Agent 写 HTML 片段 + 内容引用，Web 界面用沙箱 iframe 原位渲染；右上角菜单可复制图像 | [`plugins/dsh-visualize/`](plugins/dsh-visualize/) |
 | dsh-browser 定制版 | Chrome 侧边栏助手，把浏览器标签页交给 dsh 来读和点；含 `@` 引用标签页、模型/推理等级菜单、消息时间与复制、右键「向 DeepSeek 提问」 | 独立 fork → [分支](https://github.com/starsYHyh/dsh-browser/tree/feat/desktop-ux-and-tab-mentions) · [Release](https://github.com/starsYHyh/dsh-browser/releases/tag/v0.1.4-dsh0.2.0-rc.2) |
 | dsh-chat-manager | 会话历史管理：搜索归档、恢复会话、安全删除。**第三方**（作者 [WSL043](https://github.com/WSL043/dsh-chat-manager)，MIT），这里只做推荐 | `npm i dsh-chat-manager` |
@@ -25,6 +25,11 @@
 
 前提：已安装 DeepSeek Harness 桌面端。本插件通过页面自己的 `Notification` API 弹通知
 （所以通知显示为 DeepSeek Harness 的身份、且遵守系统专注模式），面向桌面 GUI。
+
+macOS 上审批会额外走一个原生小窗：等待审批且 DSH 不在前台时，屏幕右上角弹出非激活的
+「拒绝 / 允许一次」面板，点完直接把结果回给 Agent。它需要 Xcode Command Line Tools 里的
+`clang`（首次使用时把 `lib/native/panel.m` 编译到 `~/.dsh/cache/dsh-notify/`，之后复用）；
+没有 `clang` 或编译失败时自动回落应用内审批，不影响其他功能。
 
 ### 1. 放置插件
 
@@ -47,6 +52,10 @@ cp -R dsh-plugins/plugins/dsh-notify ~/.dsh/profiles/<profile>/plugins/
 
 `name` 是**相对该 patch 文件所在目录**的路径，所以插件目录必须和 `cordis.patch.yml` 同级放在 `plugins/` 下。
 
+审批小窗的开关可选（不写就是默认值）：`approvalPopup`、`popupTimeoutMs`（默认 180 秒）、
+`onlyWhenBackground`、`includeSubagents`、`frontmostBundleId`。含义见
+[插件 README](plugins/dsh-notify/README.md#配置cordispatchyml)。
+
 ### 3. 重启 dsh
 
 桌面 App 用 `Cmd+Q` **完全退出**再启动。
@@ -62,10 +71,18 @@ __dshNotify.test()    // 立刻弹一条测试通知
 
 > macOS 不给前台应用弹横幅：先把窗口切到别的应用，再回车执行 `__dshNotify.test()`。
 
+单独预览审批小窗（会停留 30 秒，点按钮或关闭即结束）：
+
+```bash
+cd ~/.dsh/profiles/<profile>
+node --input-type=module -e "const { prompt } = await import('./plugins/dsh-notify/lib/native/runner.js'); console.log(await prompt({ title: 'bash 请求提升权限', subtitle: 'dsh-dev', body: '这是一条测试原因', meta: 'DeepSeek Harness · 等待审批', allowLabel: '允许一次', denyLabel: '拒绝', timeoutMs: 30000 }))"
+```
+
 离线回归测试（纯逻辑，不需要 dsh 在跑）：
 
 ```bash
-node plugins/dsh-notify/test/harness.mjs
+node plugins/dsh-notify/test/harness.mjs   # 浏览器半
+node plugins/dsh-notify/test/host.mjs      # Host 半：配置、前台判断、队列、超时/中止
 ```
 
 ## 安装 dsh-visualize

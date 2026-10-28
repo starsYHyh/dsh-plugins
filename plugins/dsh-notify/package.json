@@ -9,7 +9,7 @@
     "url": "git+https://github.com/starsYHyh/dsh-plugins.git",
     "directory": "plugins/dsh-notify"
   },
-  "description": "Native desktop notifications for DSH sessions: turn completion and pending confirmations",
+  "description": "Native desktop notifications for DSH sessions: turn completion, pending confirmations, and a macOS approval popup that answers permission requests without switching windows",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
